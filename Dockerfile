@@ -3,7 +3,7 @@ WORKDIR /source
 
 # copy csproj and restore as distinct layers
 COPY *.sln .
-COPY WebApplication1/*.csproj ./WebApplication1/
+COPY WebApplication1/WebApplication1.csproj ./WebApplication1/
 RUN dotnet restore
 
 # copy everything else and build app
