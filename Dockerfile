@@ -1,18 +1,19 @@
-# syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /source
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
+# copy csproj and restore as distinct layers
+COPY *.sln .
+COPY WebApplication1/*.csproj ./WebApplication1/
 RUN dotnet restore
 
-# Copy everything else and build
-COPY ../engine/examples ./
-RUN dotnet publish -c Release -o out
+# copy everything else and build app
+COPY WebApplication1/. ./WebApplication1/
+WORKDIR /source/WebApplication1
+RUN dotnet publish -c release -o /app --no-restore
 
-# Build runtime image
+# final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=build /app ./
 ENTRYPOINT ["dotnet", "aspnetapp.dll"]
 
